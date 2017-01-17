@@ -1,8 +1,20 @@
 #!/usr/bin/env python
 import sys
 import logging
+import rrdconfig
+from readCPUfromRRD import get_cpu_utilization
 from datetime import date
 from queryDB import select_query
+
+def setup_machine_type_env(machine_type):
+	if machine_type == 'phy':
+		rrdconfig.resolution = 300
+	elif machine_type == 'vm':
+		rrdconfig.resolution = 86400
+	else:
+		print 'wrong machine type'
+		sys.exit()
+
 
 def process_to_machine_list(result):
 	machine_list = set()
@@ -37,7 +49,8 @@ if __name__ == '__main__':
         data_type = sys.argv[3]
         output_file_name = sys.argv[4]
     machine_list = get_machine_list(machine_type)
+    setup_machine_type_env(machine_type)
     if data_type == 'cpu':
-        get_cpu_utilization(machine_list, output_file_name)
+        get_cpu_utilization(file_path, machine_list, output_file_name)
     # elif data_type == 'mem':
     #     get_mem_utilzation(machine_list, output_file_name)
